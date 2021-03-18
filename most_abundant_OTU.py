@@ -98,7 +98,7 @@ for col_no in range(5, COL_NO):
     treshold = 0.05 # abundance treshold
     count = 0 # number of zOTUs with abundance above treshold value
     for row_no in range(1, ROW_NO):
-        if first < EUC_ABUND[row_no][col_no]:
+        if first <= EUC_ABUND[row_no][col_no]:
             first = EUC_ABUND[row_no][col_no]
             first_index = row_no # stores row number of otu with highest abundance
         if treshold < EUC_ABUND[row_no][col_no]:

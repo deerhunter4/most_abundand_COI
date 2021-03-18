@@ -80,7 +80,10 @@ EUC.append(TOTALS)
 EUC_ABUND = [x[:] for x in EUC] # deep copy
 for col_no in range(4, COL_NO):
     for row_no in range(1, ROW_NO):    # Note: does NOT include the TOTAL row!
-        EUC_ABUND[row_no][col_no] = round(float(EUC[row_no][col_no])/EUC[-1][col_no], 4)
+        if EUC[-1][col_no] > 0:
+            EUC_ABUND[row_no][col_no] = round(float(EUC[row_no][col_no])/EUC[-1][col_no], 4)
+        else:
+            EUC_ABUND[row_no][col_no] = 0
 
 ### Creating new table with most abundand barcode per library (sample) and fasta file
 NEW_HEAD = ["Sample", "Sequence", "Abundance", "Abundance > 5%", "Bacteria", "Taxonomy"] # new col names
@@ -91,6 +94,7 @@ print(NEW_HEAD[-1], file=OUTPUT)
 EUC5_YES = []
 for col_no in range(5, COL_NO):
     first = 0 # item to store highest abundance value
+    first_index = 0
     treshold = 0.05 # abundance treshold
     count = 0 # number of zOTUs with abundance above treshold value
     for row_no in range(1, ROW_NO):

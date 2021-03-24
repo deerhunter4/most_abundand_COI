@@ -44,7 +44,7 @@ for row_no in range(1,ROW_NO):
             if int(TABLE[row_no][col_no]) > 0: # if number of reads is larger than 0, add sample name to the list BAC_YES
                 BAC_YES.append(HEAD[col_no])
 
-    else:
+    elif not 'Spikein' in TABLE[row_no][2]:
         EUC.append(TABLE[row_no]) # if taxonomy do not starts with "Bacteria" add the row to EUC table as a list
 
     BAC_YES = list(set(BAC_YES)) # list of samples that have at least one bacterial zotu, takes unique values from BAC_YES

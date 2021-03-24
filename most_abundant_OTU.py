@@ -86,7 +86,7 @@ for col_no in range(4, COL_NO):
             EUC_ABUND[row_no][col_no] = 0
 
 ### Creating new table with most abundand barcode per library (sample) and fasta file
-NEW_HEAD = ["Sample", "Sequence", "Abundance", "Abundance > 5%", "Bacteria", "Taxonomy"] # new col names
+NEW_HEAD = ["Sample", "Sequence", "Abundance", "reads", "Abundance > 5%", "Bacteria", "Taxonomy"] # new col names
 for item in NEW_HEAD[:-1]:
     print(item, file=OUTPUT, end="\t")
 print(NEW_HEAD[-1], file=OUTPUT)
@@ -112,12 +112,13 @@ for col_no in range(5, COL_NO):
 
     EUC5_YES = list(set(EUC5_YES)) # list of zotus that in at least one sample represents at least 5% of total Eucaryotic reads
 
-    to_add = [HEAD[col_no],EUC[first_index][3], first, count, bacteria, EUC[first_index][2]]
-    to_fasta = to_add[:2]
-    print(">", to_fasta[0], "\n", to_fasta[1], file=OUTPUT2, sep="" )
-    for item in to_add[:-1]:
-        print(item, file=OUTPUT, end="\t")
-    print(to_add[-1], file=OUTPUT)
+    if first != 0:
+        to_add = [HEAD[col_no],EUC[first_index][3], first, EUC[first_index][col_no], count, bacteria, EUC[first_index][2]]
+        to_fasta = to_add[:2]
+        print(">", to_fasta[0], "\n", to_fasta[1], file=OUTPUT2, sep="" )
+        for item in to_add[:-1]:
+            print(item, file=OUTPUT, end="\t")
+        print(to_add[-1], file=OUTPUT)
 
 for item in HEAD[:-1]:
     print(item, file=OUTPUT_EUC, end="\t")

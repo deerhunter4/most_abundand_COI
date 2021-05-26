@@ -130,4 +130,8 @@ for row_no in range(1,ROW_NO):
             print(item, file=OUTPUT_EUC, end="\t")
         print(EUC[row_no][-1], file=OUTPUT_EUC)
 
-
+INPUT.close()
+OUTPUT_BAC.close() # bac.txt
+OUTPUT_EUC.close() # euc5.txt
+OUTPUT.close() # barcode.txt
+OUTPUT2.close() # barcode.fasta

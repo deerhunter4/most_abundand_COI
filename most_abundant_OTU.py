@@ -1,25 +1,33 @@
 #! /usr/bin/env python3
 
-import sys
-import os
+import os, argparse, sys
 
-if len(sys.argv) != 2:
-    sys.exit('----- project_3.py v. 1.0, M. Buczek, 12th Feb 2021 -----\n'
+parser = argparse.ArgumentParser(description='----- project_3.py v. 1.0, M. Buczek, 12th Feb 2021 -----\n'
              'This script produce four files, from COI zOTU table:\n' 
              '- barcode.txt that contains info about most abundand COI barcode, taxonomy and bacteria presence\n' 
              '- barcode.fasta, containing most abundand Eucaryotic COI barcode per each library/sample\n'
              '- euc5.txt, containing information about Eucaryotic COI sequences that represents at least 5% of total Eucaryotic reads per sample\n'
              '- bac.txt, containing information about bacterial COI sequences\n'
-             '     e.g.,  project_3.py OTUs.txt all_zotu_table_expanded.txt\n')   
-             
-### Assigning script arguments to variables
-Script, path_to_input_file = sys.argv
+             '     e.g.,  project_3.py OTUs.txt all_zotu_table_expanded.txt\n')
 
-INPUT = open(path_to_input_file, "r")
-OUTPUT_BAC = open("bac_" + os.path.splitext(path_to_input_file)[0] + ".txt", mode= "w") # bac.txt
-OUTPUT_EUC = open("euc5_" + os.path.splitext(path_to_input_file)[0] + ".txt", mode= "w") # euc5.txt
-OUTPUT = open("barcode_" + os.path.splitext(path_to_input_file)[0] + ".txt", mode= "w") # barcode.txt
-OUTPUT2 = open("barcode_" + os.path.splitext(path_to_input_file)[0] + ".fasta", mode= "w") # barcode.fasta
+# positional arguments
+parser.add_argument("path_to_input_file", metavar='<zOTU_table>', help="file containing zOTU table, see eg. in the GitHub repository")
+
+# optional arguments
+parser.add_argument("-lower", metavar='<lower_abundance_treshold>', type=float, help="minimum OTU abundance treshold(default: 0.05)", default=0.05)
+parser.add_argument("-upper", metavar='<upper_abundance_treshold>', type=float, help="minimum OTU abundance treshold(default: 0.00)", default=0.00)
+parser.add_argument("-reads", metavar='<reads_treshold>', type=int, help="minimum number o reads per library treshold(default: 20)", default=20)
+
+# if no arguments were given, printing the help message (args = "--help")
+args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
+
+print(args.lower)
+
+INPUT = open(args.path_to_input_file, "r")
+OUTPUT_BAC = open("bac_" + os.path.splitext(args.path_to_input_file)[0] + ".txt", mode= "w") # bac.txt
+OUTPUT_EUC = open("euc5_" + os.path.splitext(args.path_to_input_file)[0] + ".txt", mode= "w") # euc5.txt
+OUTPUT = open("barcode_" + os.path.splitext(args.path_to_input_file)[0] + ".txt", mode= "w") # barcode.txt
+OUTPUT2 = open("barcode_" + os.path.splitext(args.path_to_input_file)[0] + ".fasta", mode= "w") # barcode.fasta
 
 # read input file as list of lists
 TABLE = []
@@ -63,7 +71,7 @@ for row_no in range(0,len(BAC)):
         del BAC_2[row_no][item] # removes samples that do not contain bacteria
     for item in BAC_2[row_no][:-1]:
         print(item, file=OUTPUT_BAC, end="\t")
-    print(BAC_2[row_no][-1], file=OUTPUT_BAC)
+    print(BAC_2[row_no][-1], file=OUTPUT_BAC) # it is adding last argument in the row from BAC_2 and ending with \n
 
 ### Adding the TOTAL row to Eucaryotic table --- added-up counts of all reads for the same sample
 TOTALS = TABLE[0][:4]
@@ -75,6 +83,15 @@ for col_no in range(4,COL_NO):
     TOTALS.append(Total)
 EUC.append(TOTALS)
 # print(EUC[-1])
+
+### Removing libraries with low number of reads
+reads = args.reads
+for row_no in range(0,len(EUC)):
+    for col_no in reversed(range(4, COL_NO)):
+        if EUC[-1][col_no] < reads:
+            del EUC[row_no][col_no] # removes samples that have less reads than treshold
+
+COL_NO = len(EUC[0]) # some columns may drop out from dataframe due to above code, so updating of the variable is needed
 
 ### Translating counts into relative abundances, with keeping both tables
 EUC_ABUND = [x[:] for x in EUC] # deep copy
@@ -95,7 +112,7 @@ EUC5_YES = []
 for col_no in range(5, COL_NO):
     first = 0 # item to store highest abundance value
     first_index = 0
-    treshold = 0.05 # abundance treshold
+    treshold = args.lower # abundance treshold
     count = 0 # number of zOTUs with abundance above treshold value
     for row_no in range(1, ROW_NO):
         if first <= EUC_ABUND[row_no][col_no]:
@@ -112,7 +129,7 @@ for col_no in range(5, COL_NO):
 
     EUC5_YES = list(set(EUC5_YES)) # list of zotus that in at least one sample represents at least 5% of total Eucaryotic reads
 
-    if first != 0:
+    if first >= args.upper:
         to_add = [HEAD[col_no], EUC[first_index][0], EUC[first_index][1], EUC[first_index][3], first, EUC[first_index][col_no], count, bacteria, EUC[first_index][2]]
         to_fasta = to_add[:4]
         print(">", to_fasta[0], ",", to_fasta[1], ",", to_fasta[2], "\n", to_fasta[3], file=OUTPUT2, sep="" )

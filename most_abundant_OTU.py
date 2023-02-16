@@ -2,13 +2,13 @@
 
 import os, argparse, sys
 
-parser = argparse.ArgumentParser(description='----- project_3.py v. 1.0, M. Buczek, 12th Feb 2021 -----\n'
+parser = argparse.ArgumentParser(description='----- most_abundant_OTU.py v. 1.0, M. Buczek, 12th Feb 2021 -----\n'
              'This script produce four files, from COI zOTU table:\n' 
              '- barcode.txt that contains info about most abundand COI barcode, taxonomy and bacteria presence\n' 
              '- barcode.fasta, containing most abundand Eucaryotic COI barcode per each library/sample\n'
-             '- euc5.txt, containing information about Eucaryotic COI sequences that represents at least 5% of total Eucaryotic reads per sample\n'
+             '- euc.txt, containing information about Eucaryotic COI sequences that represents at least 5% of total Eucaryotic reads per sample\n'
              '- bac.txt, containing information about bacterial COI sequences\n'
-             '     e.g.,  project_3.py OTUs.txt all_zotu_table_expanded.txt\n')
+             '     e.g.,  most_abundant_OTU.py all_zotu_table_expanded.txt\n')
 
 # positional arguments
 parser.add_argument("path_to_input_file", metavar='<zOTU_table>', help="file containing zOTU table, see eg. in the GitHub repository")
@@ -25,7 +25,7 @@ args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
 
 INPUT = open(args.path_to_input_file, "r")
 OUTPUT_BAC = open("bac_" + os.path.splitext(args.path_to_input_file)[0] + ".txt", mode= "w") # bac.txt
-OUTPUT_EUC = open("euc5_" + os.path.splitext(args.path_to_input_file)[0] + ".txt", mode= "w") # euc5.txt
+OUTPUT_EUC = open("euc_" + os.path.splitext(args.path_to_input_file)[0] + ".txt", mode= "w") # euc.txt
 OUTPUT = open("barcode_" + os.path.splitext(args.path_to_input_file)[0] + ".txt", mode= "w") # barcode.txt
 OUTPUT2 = open("barcode_" + os.path.splitext(args.path_to_input_file)[0] + ".fasta", mode= "w") # barcode.fasta
 
@@ -107,8 +107,8 @@ for item in NEW_HEAD[:-1]:
     print(item, file=OUTPUT, end="\t")
 print(NEW_HEAD[-1], file=OUTPUT)
 
-EUC5_YES = []
-EUC5_YES_sample = []
+EUC_YES = []
+EUC_YES_sample = []
 most_abundand = []
 
 for col_no in range(5, COL_NO):
@@ -122,8 +122,8 @@ for col_no in range(5, COL_NO):
             first_index = row_no # stores row number of otu with highest abundance
         if treshold < EUC_ABUND[row_no][col_no] and 0.5 > EUC_ABUND[row_no][col_no]:
             count += 1
-            EUC5_YES.append(row_no) # collecting rows (zOTUz) that fulfill above requirements
-            EUC5_YES_sample.append(col_no) # collecting amplicon library (sample) name matching OTU one line above
+            EUC_YES.append(row_no) # collecting rows (zOTUz) that fulfill above requirements
+            EUC_YES_sample.append(col_no) # collecting amplicon library (sample) name matching OTU one line above
 
     if HEAD[col_no] in BAC_YES:
         bacteria = "yes"
@@ -142,10 +142,10 @@ for col_no in range(5, COL_NO):
         print(to_add[-1], file=OUTPUT)
 
 ### Creating new table with potential Parasitoids and Contamination
-NEW_HEAD_EUC5 = ["Sample", "zOTU", "OTU", "Sequence", "Abundance", "reads", "Parasitoid/Contamination", "Taxonomy"] # new col names
-for item in NEW_HEAD_EUC5[:-1]:
+NEW_HEAD_EUC = ["Sample", "zOTU", "OTU", "Sequence", "Abundance", "reads", "Parasitoid/Contamination", "Taxonomy"] # new col names
+for item in NEW_HEAD_EUC[:-1]:
     print(item, file=OUTPUT_EUC, end="\t")
-print(NEW_HEAD_EUC5[-1], file=OUTPUT_EUC)
+print(NEW_HEAD_EUC[-1], file=OUTPUT_EUC)
 
 # get list of most abundand OTUs names (not row numbers)
 most_abundand_otu = []
@@ -154,8 +154,8 @@ for item in most_abundand:
 
 most_abundand_otu = sorted(list(set(most_abundand_otu))) # not needed
 
-for row_no, name in zip(EUC5_YES, EUC5_YES_sample): # iteration on two lists at the same time
-    if EUC_ABUND[row_no][1] in most_abundand_otu: # check if OTU from EUC5_YES list is among most_abundand OTUs
+for row_no, name in zip(EUC_YES, EUC_YES_sample): # iteration on two lists at the same time
+    if EUC_ABUND[row_no][1] in most_abundand_otu: # check if OTU from EUC_YES list is among most_abundand OTUs
         to_add = [HEAD[name], EUC[row_no][0], EUC[row_no][1], EUC[row_no][3], EUC_ABUND[row_no][name], EUC[row_no][name], "Contamination", EUC[row_no][2]]
     else:
         to_add = [HEAD[name], EUC[row_no][0], EUC[row_no][1], EUC[row_no][3], EUC_ABUND[row_no][name], EUC[row_no][name], "Parasitoid", EUC[row_no][2]]
@@ -165,6 +165,6 @@ for row_no, name in zip(EUC5_YES, EUC5_YES_sample): # iteration on two lists at 
 
 INPUT.close()
 OUTPUT_BAC.close() # bac.txt
-OUTPUT_EUC.close() # euc5.txt
+OUTPUT_EUC.close() # euc.txt
 OUTPUT.close() # barcode.txt
 OUTPUT2.close() # barcode.fasta

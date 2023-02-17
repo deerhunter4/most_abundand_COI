@@ -17,8 +17,8 @@ most_abundant_OTU.py input_file.txt
 
 **Optional arguments:**
 
-**-upper**  minimum abundance treshold that zOTU has to have to be considered as most abundand zOTU. If non of the zOTU abundance will match this requirement then library/sample will not be represented in barcode.txt file. To prevent this situacion default minimum abundance treshold is assigned to 0.00
-**-lower**  minimum abundance treshold that zOTU has to have to be considered as significant contaminant or parasitoid of particular library/sample (default: 0.05)
+**-upper**  minimum abundance treshold that zOTU has to have to be considered as most abundand zOTU. If non of the zOTU abundance will match this requirement then library/sample will not be represented in barcode.txt file. To prevent this situacion default minimum abundance treshold is assigned to 0.00  
+**-lower**  minimum abundance treshold that zOTU has to have to be considered as significant contaminant or parasitoid of particular library/sample (default: 0.05)  
 **-reads**  minimum number of reads per library/sample to be included in the output files (default: 20)
 
 **Example of input file:**

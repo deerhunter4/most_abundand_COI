@@ -3,7 +3,8 @@
 This script produce four files, from COI zOTU table:
 - **barcode.txt** that, per each library/sample, contains info about most abundant zOTU (COI barcode), taxonomy and bacteria presence
 - **barcode.fasta**, containing most abundant Eucaryotic zOTU sequence (COI barcode) per each library/sample
-- **euc5.txt**, containing information about Eucaryotic zOTU sequences that represents at least 5% of total Eucaryotic reads per library/sample
+- **euc.txt**, containing information about Eucaryotic zOTU sequences that represents at least 5% of total Eucaryotic reads per library/sample,
+               additionally zOTU are marked as potential Parasitoids or Contamination (e.g. barcode from other sample, food)
 - **bac.txt**, containing information about all bacterial zOTUs in dataset
 
 **Requirements:**
@@ -13,6 +14,12 @@ Unix environment, Python 3
 **Usage:**
 
 most_abundant_OTU.py input_file.txt
+
+**Optional arguments:**
+
+**-upper**  minimum abundance treshold that zOTU has to have to be considered as most abundand zOTU. If non of the zOTU abundance will match this requirement then library/sample will not be represented in barcode.txt file. To prevent this situacion default minimum abundance treshold is assigned to 0.00
+**-lower**  minimum abundance treshold that zOTU has to have to be considered as significant contaminant or parasitoid of particular library/sample (default: 0.05)
+**-reads**  minimum number of reads per library/sample to be included in the output files (default: 20)
 
 **Example of input file:**
 

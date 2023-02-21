@@ -147,15 +147,15 @@ for item in NEW_HEAD_EUC[:-1]:
     print(item, file=OUTPUT_EUC, end="\t")
 print(NEW_HEAD_EUC[-1], file=OUTPUT_EUC)
 
-# get list of most abundand OTUs names (not row numbers)
+# get list of most abundand OTUs spacies names (not row numbers)
 most_abundand_otu = []
 for item in most_abundand:
-    most_abundand_otu.append(EUC_ABUND[item][1])
+    most_abundand_otu.append(EUC_ABUND[item][2].split(',')[6][:-6]) # list of species names (last taxonomy level), that are most abundand in the library
 
 most_abundand_otu = sorted(list(set(most_abundand_otu))) # not needed
 
 for row_no, name in zip(EUC_YES, EUC_YES_sample): # iteration on two lists at the same time
-    if EUC_ABUND[row_no][1] in most_abundand_otu: # check if OTU from EUC_YES list is among most_abundand OTUs
+    if EUC_ABUND[row_no][2].split(',')[6][:-6] in most_abundand_otu: # check if spacies name from EUC_YES list is among most_abundand species
         to_add = [HEAD[name], EUC[row_no][0], EUC[row_no][1], EUC[row_no][3], EUC_ABUND[row_no][name], EUC[row_no][name], "Contamination", EUC[row_no][2]]
     else:
         to_add = [HEAD[name], EUC[row_no][0], EUC[row_no][1], EUC[row_no][3], EUC_ABUND[row_no][name], EUC[row_no][name], "Parasitoid", EUC[row_no][2]]
